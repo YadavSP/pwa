@@ -30,7 +30,7 @@ export const Header = () => {
       <div className="container mx-auto flex h-16 max-w-screen-2xl items-center px-4">
         
         {/* --- LOGO AND ANIMATED GRADIENT BRAND NAME --- */}
-        <Link href="/" className="mr-6 flex items-center space-x-3">
+        <Link href="/Products" className="mr-6 flex items-center space-x-3">
           <Image
             src="/logo.gif"
             alt="Unbottled Animated Logo"

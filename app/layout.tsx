@@ -1,8 +1,10 @@
 
+
+
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 
-
+import { Toaster } from "@/components/ui/toaster";
 
 const APP_NAME = "PWA App";
 const APP_DEFAULT_TITLE = "My Awesome PWA App";
@@ -55,7 +57,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body >{children}</body>
+      <body >{children}  <Toaster /></body>
+      
     </html>
   );
 }
+
