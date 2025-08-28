@@ -1,84 +1,91 @@
-"use client"; // Make sure this is at the very top
+"use client";
 
 import { Search, Heart, ShoppingBag, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import Link from 'next/link'; // Use next/link for client-side navigation
-import { useEffect, useState } from 'react'; // Import useEffect and useState
+import Link from 'next/link';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export const Header = () => {
-  //const [cartItemCount, setCartItemCount] = useState(0); // Initialize with 0
+  const [cartItemCount, setCartItemCount] = useState(0);
 
-//   useEffect(() => {
-//     // This code only runs on the client side
-//     const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-//     const totalItems = existingOrders.reduce((acc: number, order: any) => 
-//       acc + order.items.reduce((itemAcc: number, item: any) => itemAcc + item.quantity, 0)
-//     , 0);
-//     setCartItemCount(totalItems);
-//   }, []); // Empty dependency array means this runs once after initial render
+  useEffect(() => {
+    try {
+      const ordersRaw = localStorage.getItem('orders');
+      if (ordersRaw) {
+        const existingOrders = JSON.parse(ordersRaw);
+        const totalItems = existingOrders.reduce((acc: any, order: { items: any[]; }) => 
+          acc + order.items.reduce((itemAcc, item) => itemAcc + item.quantity, 0), 0);
+        setCartItemCount(totalItems);
+      }
+    } catch (error) {
+      console.error("Failed to parse orders from localStorage", error);
+    }
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary to-primary-hover rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">S</span>
-            </div>
-            <span className="font-bold text-xl text-foreground">StyleStore</span>
-          </div>
-
-          {/* Search Bar - Hidden on mobile */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+    //  --- HEADER WITH GRADIENT BACKGROUND ---
+    <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-purple-200 via-pink-200 to-red-200 shadow-sm">
+      <div className="container mx-auto flex h-16 max-w-screen-2xl items-center px-4">
+        
+        {/* --- LOGO AND ANIMATED GRADIENT BRAND NAME --- */}
+        <Link href="/" className="mr-6 flex items-center space-x-3">
+          <Image
+            src="/logo.gif"
+            alt="Unbottled Animated Logo"
+            width={180}
+            height={140}
+            unoptimized={true}
+            className="rounded-lg"
+          />
+          <span className="hidden sm:inline-block text-2xl font-bold
+                           bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 
+                           text-transparent bg-clip-text animate-gradient">
+            Unbottled
+          </span>
+        </Link>
+        
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          {/* Centered Search Bar - Hidden on mobile for a cleaner look */}
+          <div className="hidden flex-1 justify-center md:flex">
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input 
                 placeholder="Search for t-shirts, jackets..." 
-                className="pl-10 bg-muted/50"
+                className="w-full rounded-full pl-10 border-gray-300 focus:border-primary focus:ring-primary"
               />
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
-            {/* Search Icon for Mobile */}
-            <Button variant="ghost" size="icon" className="md:hidden">
+          {/* Action Icons */}
+          <div className="flex items-center space-x-1">
+            <Button variant="ghost" size="icon" className="md:hidden" aria-label="Search">
               <Search className="h-5 w-5" />
             </Button>
 
-            <Link href='/wishlist'>
-              <Heart className="h-5 w-5" />
+            <Link href='/wishlist' passHref>
+              <Button variant="ghost" size="icon" aria-label="Wishlist">
+                <Heart className="h-5 w-5" />
+              </Button>
             </Link>
 
-            <Link 
-              href='/cart'
-              className="relative"
-            >
-              <ShoppingBag className="h-5 w-5" />
-
-              {/* {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )} */}
+            <Link href='/cart' passHref>
+              <Button variant="ghost" size="icon" className="relative" aria-label="Shopping Cart">
+                <ShoppingBag className="h-5 w-5" />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Button>
             </Link>
 
-            <Link href='/profile'>
-              <User className="h-5 w-5" />
+            <Link href='/profile' passHref>
+              <Button variant="ghost" size="icon" aria-label="User Profile">
+                <User className="h-5 w-5" />
+              </Button>
             </Link>
-          </div>
-        </div>
-
-        {/* Mobile Search Bar */}
-        <div className="md:hidden mt-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input 
-              placeholder="Search for t-shirts, jackets..." 
-              className="pl-10 bg-muted/50"
-            />
           </div>
         </div>
       </div>

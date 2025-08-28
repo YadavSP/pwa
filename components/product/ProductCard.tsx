@@ -14,7 +14,7 @@ interface ProductCardProps {
 export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     // The entire card acts as a link to the product detail page
-    <Link href={`/product/${product.id}`} className="block"> {/* Added className="block" for proper styling */}
+    <Link href={`/ProductDetail/${product.id}`} className="block"> {/* Added className="block" for proper styling */}
       <Card className="group cursor-pointer border-border/40 hover:shadow-lg transition-all duration-300 hover:border-border h-full flex flex-col"> {/* Added h-full and flex props for consistent card height */}
         <CardContent className="p-0 flex-grow"> {/* flex-grow to make content take available space */}
           <div className="relative overflow-hidden rounded-t-lg">
