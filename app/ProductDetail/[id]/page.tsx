@@ -1,17 +1,18 @@
-// app/ProductDetail/[id]/page.tsx
+// FILE: app/ProductDetail/[id]/page.tsx (CLEANED UP VERSION)
+
 "use client"
 
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
-// Shadcn UI & Lucide Icons - Note the capital letters
+// Shadcn UI & Lucide Icons
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card'; // <-- Must be <Card>, not <card>
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Heart, Star, Shield, Truck, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Star, Shield, Truck, RotateCcw, ShoppingBag, Zap } from 'lucide-react'; // <-- Removed Heart, Added Zap
 
 // Your Components & Data
 import { dummyProducts } from '@/data/product';
@@ -36,31 +37,49 @@ const ProductDetail = () => {
     );
   }
 
-  const handleAddToCart = () => {
-    // Business logic remains the same...
+  // This single function now handles both "Add to Cart" and "Buy Now"
+  const handlePurchaseAction = () => {
     if (!selectedSize || !selectedColor) {
       toast({
         title: "Selection Required",
-        description: "Please select a size and color before placing your order.",
-        variant: "destructive"
+        description: "Please select a size and color.",
+        variant: "destructive",
       });
       return;
     }
-    const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    const newOrder = {
-      id: Date.now().toString(),
-      items: [{ productId: product.id, product, size: selectedSize, color: selectedColor, quantity: 1 }],
-      total: product.price,
-      status: 'pending',
-      date: new Date().toISOString(),
-      estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-    };
-    localStorage.setItem('orders', JSON.stringify([...existingOrders, newOrder]));
+
+    let cart = JSON.parse(localStorage.getItem('cart') || '{"items":[]}');
+
+    const existingItemIndex = cart.items.findIndex(
+      (item: any) =>
+        item.productId === product.id &&
+        item.size === selectedSize &&
+        item.color === selectedColor
+    );
+
+    if (existingItemIndex > -1) {
+      cart.items[existingItemIndex].quantity += 1;
+    } else {
+      const newItem = {
+        productId: product.id,
+        product,
+        size: selectedSize,
+        color: selectedColor,
+        quantity: 1,
+      };
+      cart.items.push(newItem);
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+
     toast({
-      title: "Success!",
-      description: "Your order has been placed and is now visible in your Orders page.",
+      variant: "success",
+      title: "Added to Cart!",
+      description: `${product.name} is now in your cart.`,
     });
-    router.push('/Orders');
+    
+    // Both buttons will lead to the cart
+    router.push('/cart');
   };
 
   return (
@@ -86,16 +105,10 @@ const ProductDetail = () => {
             <div>
               <p className="text-sm font-medium text-primary uppercase tracking-wide">{product.brand}</p>
               <h1 className="text-3xl lg:text-4xl font-bold text-foreground mt-1">{product.name}</h1>
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-1">
-                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-bold text-foreground">{product.rating}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">{product.reviewCount} reviews</span>
-              </div>
+              
+              {/* --- RATING AND REVIEW SECTION REMOVED --- */}
             </div>
 
-            {/* Correctly capitalized <Card> and <CardContent> */}
             <Card className="bg-card">
               <CardContent className="p-4 space-y-2">
                 <div className="flex items-baseline gap-3">
@@ -113,10 +126,8 @@ const ProductDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Correctly capitalized <Card> and <CardContent> */}
             <Card className="bg-card">
               <CardContent className="p-4 space-y-4">
-                {/* --- SIZE SELECTION --- */}
                 <div>
                   <h3 className="text-base font-semibold text-foreground mb-3">Select Size</h3>
                   <div className="flex flex-wrap justify-start gap-3">
@@ -139,7 +150,6 @@ const ProductDetail = () => {
                 
                 <Separator />
 
-                {/* --- COLOR SELECTION --- */}
                 <div>
                   <h3 className="text-base font-semibold text-foreground mb-3">Select Color</h3>
                   <div className="flex flex-wrap items-center gap-3">
@@ -163,22 +173,25 @@ const ProductDetail = () => {
               </CardContent>
             </Card>
 
-            {/* --- ACTION BUTTONS --- */}
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <Button variant="outline" size="lg" className="flex items-center gap-2">
-                  <Heart className="h-5 w-5" />
-                  Wishlist
-                </Button>
-                <Button 
-                  onClick={handleAddToCart} 
-                  size="lg" 
-                  className="w-full text-white font-bold bg-gradient-to-r from-green-500 to-emerald-600 shadow-md hover:from-green-600 hover:to-emerald-700 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
-                >
-                  Place Order
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground text-center">This is a demo. No payment is required.</p>
+            {/* --- ACTION BUTTONS REDESIGNED --- */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button 
+                onClick={handlePurchaseAction} 
+                variant="outline"
+                size="lg" 
+                className="w-full flex items-center gap-2"
+              >
+                <ShoppingBag className="h-5 w-5" />
+                Add to Cart
+              </Button>
+              <Button 
+                onClick={handlePurchaseAction} 
+                size="lg" 
+                className="w-full text-white font-bold bg-gradient-to-r from-orange-500 to-red-500 shadow-md hover:from-orange-600 hover:to-red-600 hover:shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
+              >
+                <Zap className="h-5 w-5" />
+                Buy Now
+              </Button>
             </div>
             
             <div className="grid grid-cols-3 gap-2 text-center">
@@ -187,7 +200,6 @@ const ProductDetail = () => {
               <div className="p-2 rounded-lg bg-card border"><Shield className="h-6 w-6 mx-auto text-muted-foreground"/><p className="text-xs mt-1">Quality Assured</p></div>
             </div>
 
-            {/* Correctly capitalized Accordion components */}
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="description"><AccordionTrigger>Description</AccordionTrigger><AccordionContent className="text-muted-foreground">{product.description}</AccordionContent></AccordionItem>
               {product.features && (

@@ -10,4 +10,15 @@ const withPWA = withPWAInit({
 
 export default withPWA({
   // Your Next.js config
+
+   images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
 });

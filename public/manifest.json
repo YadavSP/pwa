@@ -1,6 +1,6 @@
 {
-  "name": "Nextjs PWA App",
-  "short_name": "NPWA",
+  "name": "Unbottled PWA App",
+  "short_name": "Unbottled",
   "theme_color": "#000",
   "background_color": "#000",
   "display": "standalone",
